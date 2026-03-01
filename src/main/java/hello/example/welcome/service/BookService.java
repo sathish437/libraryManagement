@@ -5,6 +5,7 @@ import hello.example.welcome.repo.BookRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,23 +24,55 @@ public class BookService {
         if(book.getAuthor()==null || book.getAuthor().isBlank()){
             throw new RuntimeException("book Author is required");
         }
+         if(book.getTotalCopies()<1){
+             throw new RuntimeException("minimum add one book");
+         }
         var existingOpt=bookRepository.findByBookTitleAndAuthor(
                 book.getBookTitle(), book.getAuthor()
         );
         if(existingOpt.isPresent()){
             BookTable existing=existingOpt.get();
             Long totalCopies=book.getTotalCopies();
-            Long addAvailable=book.getAvailableCopies();
 
             existing.setTotalCopies(existing.getTotalCopies()+totalCopies);
-            existing.setAvailableCopies(existing.getAvailableCopies()+addAvailable);
+            existing.setAvailableCopies(existing.getAvailableCopies()+totalCopies);
             return bookRepository.save(existing);
         }
         return bookRepository.save(book);
     }
 
     public List<BookTable> addManyBooks(List<BookTable> bookTable){
-        return bookRepository.saveAll(bookTable);
+        if(bookTable.isEmpty()){
+            throw new RuntimeException("the bookTable is empty");
+        }
+        List<BookTable> newBooks=new ArrayList<>();
+        for (BookTable table : bookTable) {
+            if (table.getBookTitle() == null || table.getBookTitle().isBlank()) {
+                throw new RuntimeException("the book title is empty");
+            }
+            if (table.getAuthor() == null || table.getAuthor().isBlank()) {
+                throw new RuntimeException("the author is empty");
+            }
+            if (table.getTotalCopies() < 1) {
+                throw new RuntimeException("add minimum one book");
+            }
+
+            var ExistingOpt = bookRepository.findByBookTitleAndAuthor(
+                    table.getBookTitle(), table.getAuthor()
+            );
+
+            if (ExistingOpt.isPresent()) {
+                BookTable existing = ExistingOpt.get();
+                Long total = table.getTotalCopies();
+
+                existing.setTotalCopies(table.getTotalCopies() + total);
+                existing.setAvailableCopies(table.getAvailableCopies() + total);
+                bookRepository.save(existing);
+            } else {
+                newBooks.add(table);
+            }
+        }
+        return bookRepository.saveAll(newBooks);
     }
 
     public BookTable getBook(Long id){
@@ -60,7 +93,6 @@ public class BookService {
         BookTable book=bookRepository.findById(id)
                         .orElseThrow(()->new RuntimeException("book not found :"+id));
         bookRepository.delete(book);
-
     }
 
     public void deleteAllBooks(){
