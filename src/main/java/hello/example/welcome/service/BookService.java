@@ -65,8 +65,8 @@ public class BookService {
                 BookTable existing = ExistingOpt.get();
                 Long total = table.getTotalCopies();
 
-                existing.setTotalCopies(table.getTotalCopies() + total);
-                existing.setAvailableCopies(table.getAvailableCopies() + total);
+                existing.setTotalCopies(existing.getTotalCopies() + total);
+                existing.setAvailableCopies(existing.getAvailableCopies() + total);
                 bookRepository.save(existing);
             } else {
                 newBooks.add(table);
@@ -75,10 +75,22 @@ public class BookService {
         return bookRepository.saveAll(newBooks);
     }
 
-    public BookTable getBook(Long id){
+    public List<BookTable> getBook(String title){
+        if(title==null || title.isBlank()){
+            throw new RuntimeException("the search box is empty");
+        }
+        List<BookTable> allBooks=bookRepository.findAll();
+        List<BookTable> result=new ArrayList<>();
 
-        return bookRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Book Not Found"));
+        for(BookTable book:allBooks){
+            if(book.getBookTitle().toLowerCase().contains(title.toLowerCase())){
+                result.add(book);
+            }
+        }
+        if(result.isEmpty()){
+            throw new RuntimeException("that book is not available");
+        }
+        return result;
     }
 
     public List<BookTable> getAllBook(){

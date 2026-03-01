@@ -21,9 +21,9 @@ public class BookController {
         return bookService.getAllBook();
     }
 
-    @GetMapping("/getBooks/{id}")
-    public BookTable getBooks(@PathVariable Long id) {
-        return bookService.getBook(id);
+    @GetMapping("/getBooks")
+    public List<BookTable> getBooks(@RequestParam String title) {
+        return bookService.getBook(title);
     }
 
     @PostMapping("/addBooks")
@@ -33,6 +33,7 @@ public class BookController {
 
     @PostMapping("/addBook")
     public BookTable addBook(@RequestBody BookTable bookTable) {
+
         return bookService.addBook(bookTable);
     }
 
