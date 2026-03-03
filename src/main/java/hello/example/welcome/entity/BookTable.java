@@ -21,9 +21,9 @@ public class BookTable {
     @Column(nullable = false,length = 100)
     private String author;
     @Column(nullable = false)
-    @Min(0)
+    @Min(1)
     private Long totalCopies;
-    @Min(0)
+    @Min(1)
     @Column(nullable = false)
     private Long availableCopies;
 }
