@@ -22,7 +22,7 @@ public class StudentService {
         List<StudentTable> newStudents=new ArrayList<>();
         for(StudentTable student:studentsList){
             if(student.getName()==null||student.getEmail()==null|| student.getName().isEmpty() || student.getEmail().isEmpty() || student.getDepartment()==null){
-                throw new RuntimeException("Enter teh Specified value");
+                throw new RuntimeException("Enter the Specified value");
             }
             var existingEmail=studentRepository.findByEmail(student.getEmail());
             if(existingEmail.isPresent()){
@@ -34,6 +34,11 @@ public class StudentService {
     }
 
     public StudentTable addStudent(StudentTable student){
+
+        var existingEmail=studentRepository.findByEmail(student.getEmail());
+        if(existingEmail.isPresent()){
+            throw new RuntimeException("that email already Exists");
+        }
         return studentRepository.save(student);
     }
 
@@ -41,9 +46,14 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Optional<StudentTable> getStudent(Long id){
-        return studentRepository.findById(id);
+    public List<StudentTable> studentSearch(String name){
+        List<StudentTable> nameList = studentRepository.findByNameContainingIgnoreCase(name);
+        if(nameList.isEmpty()){
+            throw new RuntimeException("it not found");
+        }
+        return nameList;
     }
+
 
     public void deleteAllStudent(){
         studentRepository.deleteAll();
