@@ -26,4 +26,6 @@ public class BookTable {
     @Min(1)
     @Column(nullable = false)
     private Long availableCopies;
+
+
 }

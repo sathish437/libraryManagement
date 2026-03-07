@@ -1,6 +1,6 @@
-package hello.example.welcome.entity;
+package hello.example.welcome.dto.request;
 
-import jakarta.persistence.*;
+import hello.example.welcome.entity.Department;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,22 +11,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class StudentTable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long studentId;
+@NoArgsConstructor
+public class StudentReqDTO {
     @NotBlank
-    @Column(nullable = false,length = 100)
     private String name;
-    @Column(nullable = false,length = 100,unique = true)
     @Email
     @NotBlank
     private String email;
     @NotNull
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     private Department department;
 }

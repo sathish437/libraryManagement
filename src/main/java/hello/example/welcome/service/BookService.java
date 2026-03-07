@@ -1,5 +1,8 @@
 package hello.example.welcome.service;
 
+import hello.example.welcome.MappingDTO.BookMapper;
+import hello.example.welcome.dto.request.BookReqDTO;
+import hello.example.welcome.dto.response.BookResDTO;
 import hello.example.welcome.entity.BookTable;
 import hello.example.welcome.repo.BookRepository;
 import org.springframework.data.domain.Sort;
@@ -7,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class BookService {
@@ -17,7 +18,9 @@ public class BookService {
         this.bookRepository=bookRepository;
     }
 
-    public BookTable addBook(BookTable book){
+    public BookResDTO addBook(BookReqDTO bookReqDTO){
+        BookTable book=BookMapper.mapToBookTable(bookReqDTO);
+        BookTable savedBook;
         if(book.getBookTitle()==null || book.getBookTitle().isBlank()){
             throw new RuntimeException("book Title is required");
         }
@@ -36,15 +39,22 @@ public class BookService {
 
             existing.setTotalCopies(existing.getTotalCopies()+totalCopies);
             existing.setAvailableCopies(existing.getAvailableCopies()+totalCopies);
-            return bookRepository.save(existing);
+            savedBook=bookRepository.save(existing);
+            return BookMapper.mapToBookResDTO(savedBook);
         }
-        return bookRepository.save(book);
+        savedBook=bookRepository.save(book);
+        return BookMapper.mapToBookResDTO(savedBook);
     }
 
-    public List<BookTable> addManyBooks(List<BookTable> bookTable){
+    public List<BookResDTO> addManyBooks(List<BookReqDTO> bookReqDTOS){
+        List<BookTable> bookTable=bookReqDTOS.stream().map(
+                BookMapper::mapToBookTable
+        ).toList();
+
         if(bookTable.isEmpty()){
             throw new RuntimeException("the bookTable is empty");
         }
+        List<BookTable> resultBooks=new ArrayList<>();
         List<BookTable> newBooks=new ArrayList<>();
         for (BookTable table : bookTable) {
             if (table.getBookTitle() == null || table.getBookTitle().isBlank()) {
@@ -67,38 +77,37 @@ public class BookService {
 
                 existing.setTotalCopies(existing.getTotalCopies() + total);
                 existing.setAvailableCopies(existing.getAvailableCopies() + total);
-                bookRepository.save(existing);
+                BookTable updatedBook=bookRepository.save(existing);
+                resultBooks.add(updatedBook);
             } else {
                 newBooks.add(table);
             }
         }
-        return bookRepository.saveAll(newBooks);
+        if(!newBooks.isEmpty()){
+            List<BookTable> savedBooks=bookRepository.saveAll(newBooks);
+            resultBooks.addAll(savedBooks);
+        }
+        return resultBooks.stream().map(BookMapper::mapToBookResDTO).toList();
     }
 
-    public List<BookTable> getBook(String title){
+    public List<BookResDTO> getBook(String title){
         if(title==null || title.isBlank()){
             throw new RuntimeException("the search box is empty");
         }
-        List<BookTable> allBooks=bookRepository.findAll();
-        List<BookTable> result=new ArrayList<>();
+        List<BookTable> result=bookRepository.findByBookTitleContainingIgnoreCase(title);
 
-        for(BookTable book:allBooks){
-            if(book.getBookTitle().toLowerCase().contains(title.toLowerCase())){
-                result.add(book);
-            }
-        }
         if(result.isEmpty()){
             throw new RuntimeException("that book is not available");
         }
-        return result;
+        return result.stream().map(BookMapper::mapToBookResDTO).toList();
     }
 
-    public List<BookTable> getAllBook(){
+    public List<BookResDTO> getAllBook(){
         List<BookTable> lists=bookRepository.findAll(Sort.by("bookTitle"));
         if(lists.isEmpty()){
             throw new RuntimeException("No books found");
         }
-        return lists;
+        return lists.stream().map(BookMapper::mapToBookResDTO).toList();
     }
 
     public void deleteBook(Long id){
@@ -108,6 +117,6 @@ public class BookService {
     }
 
     public void deleteAllBooks(){
-        bookRepository.deleteAll( );
+        bookRepository.deleteAll();
     }
 }

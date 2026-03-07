@@ -6,5 +6,5 @@ public enum Department {
     ECE,
     CIVIL,
     CSE,
-    MECHATRONICS;
+    MECHATRONICS
 }

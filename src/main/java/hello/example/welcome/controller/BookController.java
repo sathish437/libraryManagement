@@ -1,5 +1,7 @@
 package hello.example.welcome.controller;
 
+import hello.example.welcome.dto.request.BookReqDTO;
+import hello.example.welcome.dto.response.BookResDTO;
 import hello.example.welcome.entity.BookTable;
 import hello.example.welcome.service.BookService;
 import org.springframework.web.bind.annotation.*;
@@ -16,24 +18,23 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/getBooks")
-    public List<BookTable> getAllBooks() {
+    @GetMapping("/getAllBooks")
+    public List<BookResDTO> getAllBooks() {
         return bookService.getAllBook();
     }
 
-    @GetMapping("/getBooks")
-    public List<BookTable> getBooks(@RequestParam String title) {
+    @GetMapping("/searchBooks")
+    public List<BookResDTO> getBooks(@RequestParam("bookTitle") String title) {
         return bookService.getBook(title);
     }
 
     @PostMapping("/addBooks")
-    public List<BookTable> addManyBook(@RequestBody List<BookTable> bookTable) {
+    public List<BookResDTO> addManyBook(@RequestBody List<BookReqDTO> bookTable) {
         return bookService.addManyBooks(bookTable);
     }
 
     @PostMapping("/addBook")
-    public BookTable addBook(@RequestBody BookTable bookTable) {
-
+    public BookResDTO addBook(@RequestBody BookReqDTO bookTable) {
         return bookService.addBook(bookTable);
     }
 
