@@ -3,9 +3,16 @@ package hello.example.welcome.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
-
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class IssueTable {
     @Id
@@ -13,15 +20,16 @@ public class IssueTable {
     private Long issueId;
     @ManyToOne
     @JoinColumn(name = "studentId")
-    StudentTable studentTable;
+    private StudentTable studentTable;
     @ManyToOne
     @JoinColumn(name = "bookId")
-    BookTable bookTable;
+    private BookTable bookTable;
     @NotNull
     private LocalDate issueDate;
     @NotNull
     private LocalDate dueDate;
-    @NotBlank
-    @Column(length = 20)
-    private String status;
+    @NotNull
+    @Column(length = 20,nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }
