@@ -1,5 +1,7 @@
 package hello.example.welcome.service;
 
+import hello.example.welcome.ExceptionHandling.EmailAlreadyExistsException;
+import hello.example.welcome.ExceptionHandling.StudentNotFoundException;
 import hello.example.welcome.MappingDTO.BookMapper;
 import hello.example.welcome.MappingDTO.StudentMapper;
 import hello.example.welcome.dto.request.StudentReqDTO;
@@ -22,17 +24,17 @@ public class StudentService {
     public List<StudentResDTO> addManyStudent(List<StudentReqDTO> studentReqDTOS){
         List<StudentTable> studentsList= studentReqDTOS.stream().map(StudentMapper::mapToStudentTable).toList();
         if(studentsList.isEmpty()){
-            throw new RuntimeException("the student is empty");
+            throw new IllegalArgumentException("the student is empty");
         }
 
         List<StudentTable> newStudents=new ArrayList<>();
         for(StudentTable student:studentsList){
             if(student.getName()==null||student.getEmail()==null|| student.getName().isEmpty() || student.getEmail().isEmpty() || student.getDepartment()==null){
-                throw new RuntimeException("Enter the Specified value");
+                throw new IllegalArgumentException("Enter the Specified value");
             }
             var existingEmail=studentRepository.findByEmail(student.getEmail());
             if(existingEmail.isPresent()){
-                throw new RuntimeException("that email already Exist");
+                throw new EmailAlreadyExistsException("that email already Exist");
             }
             newStudents.add(student);
         }
@@ -45,7 +47,7 @@ public class StudentService {
 
         var existingEmail=studentRepository.findByEmail(student.getEmail());
         if(existingEmail.isPresent()){
-            throw new RuntimeException("that email already Exists");
+            throw new EmailAlreadyExistsException("that email already Exists");
         }
         StudentTable result=studentRepository.save(student);
         return StudentMapper.mapToStudentResDTO(result);
@@ -54,7 +56,7 @@ public class StudentService {
     public List<StudentResDTO> getAllStudents(){
         List<StudentTable> students=studentRepository.findAll();
         if(students.isEmpty()){
-            throw new RuntimeException("Students Not Found");
+            throw new StudentNotFoundException("Students Not Found");
         }
         return students.stream().map(StudentMapper::mapToStudentResDTO).toList();
     }
@@ -62,7 +64,7 @@ public class StudentService {
     public List<StudentResDTO> studentSearch(String name){
         List<StudentTable> nameList = studentRepository.findByNameContainingIgnoreCase(name);
         if(nameList.isEmpty()){
-            throw new RuntimeException("it not found");
+            throw new StudentNotFoundException("that student not found");
         }
         return nameList.stream().map(StudentMapper::mapToStudentResDTO).toList();
     }
@@ -74,7 +76,7 @@ public class StudentService {
 
     public void deleteStudent(Long id){
         StudentTable student=studentRepository.findById(id)
-                        .orElseThrow(()-> new RuntimeException(id+" its not found"));
+                        .orElseThrow(()-> new StudentNotFoundException(id+" not found"));
         studentRepository.delete(student);
     }
 }

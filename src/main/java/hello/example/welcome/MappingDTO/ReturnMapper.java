@@ -7,7 +7,7 @@ import hello.example.welcome.entity.ReturnTable;
 
 public class ReturnMapper {
     public static ReturnTable mapToReturnTable(ReturnReqDTO returnReqDTO, IssueTable issue){
-        ReturnTable returns=new ReturnTable();
+        ReturnTable  returns=new ReturnTable();
 
         returns.setIssueTable(issue);
         returns.setReturnDate(returnReqDTO.getReturnDate());

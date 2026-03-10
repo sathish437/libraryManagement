@@ -1,5 +1,6 @@
 package hello.example.welcome.controller;
 
+import hello.example.welcome.ExceptionHandling.BookNotFoundException;
 import hello.example.welcome.dto.request.BookReqDTO;
 import hello.example.welcome.dto.response.BookResDTO;
 import hello.example.welcome.entity.BookTable;
@@ -24,7 +25,7 @@ public class BookController {
     }
 
     @GetMapping("/searchBooks")
-    public List<BookResDTO> getBooks(@RequestParam("bookTitle") String title) {
+    public List<BookResDTO> getBooks(@RequestParam("bookTitle") String title){
         return bookService.getBook(title);
     }
 
