@@ -6,8 +6,10 @@ import hello.example.welcome.entity.BookTable;
 import hello.example.welcome.entity.IssueTable;
 import hello.example.welcome.entity.StudentTable;
 
+import java.util.Optional;
+
 public class IssueMapper {
-    public static IssueTable mapToIssueTable(IssueReqDTO issueReqDTO,StudentTable student,BookTable book){
+    public static IssueTable mapToIssueTable(IssueReqDTO issueReqDTO, StudentTable student, BookTable book){
         IssueTable issueTable=new IssueTable();
 
         issueTable.setStudentTable(student);

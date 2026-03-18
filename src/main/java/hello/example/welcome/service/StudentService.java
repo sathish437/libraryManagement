@@ -32,8 +32,8 @@ public class StudentService {
             if(student.getName()==null||student.getEmail()==null|| student.getName().isEmpty() || student.getEmail().isEmpty() || student.getDepartment()==null){
                 throw new IllegalArgumentException("Enter the Specified value");
             }
-            var existingEmail=studentRepository.findByEmail(student.getEmail());
-            if(existingEmail.isPresent()){
+            StudentTable existingEmail=studentRepository.findByEmail(student.getEmail());
+            if(existingEmail!=null){
                 throw new EmailAlreadyExistsException("that email already Exist");
             }
             newStudents.add(student);
@@ -45,8 +45,8 @@ public class StudentService {
     public StudentResDTO addStudent(StudentReqDTO studentReqDTO){
         StudentTable student=StudentMapper.mapToStudentTable(studentReqDTO);
 
-        var existingEmail=studentRepository.findByEmail(student.getEmail());
-        if(existingEmail.isPresent()){
+        StudentTable existingEmail=studentRepository.findByEmail(student.getEmail());
+        if(existingEmail !=null){
             throw new EmailAlreadyExistsException("that email already Exists");
         }
         StudentTable result=studentRepository.save(student);
@@ -68,6 +68,7 @@ public class StudentService {
         }
         return nameList.stream().map(StudentMapper::mapToStudentResDTO).toList();
     }
+
 
 
     public void deleteAllStudent(){
