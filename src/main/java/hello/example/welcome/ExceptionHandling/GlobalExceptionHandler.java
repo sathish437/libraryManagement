@@ -36,4 +36,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(map,HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    public ResponseEntity<HashMap<String,Object>> handleInvalidEmailException(InvalidEmailException ex){
+        HashMap<String,Object> map=new HashMap<>();
+
+        map.put("message",ex.getMessage());
+        map.put("StatusCode",HttpStatus.BAD_REQUEST.value());
+
+        return new ResponseEntity<>(map,HttpStatus.BAD_REQUEST);
+    }
 }

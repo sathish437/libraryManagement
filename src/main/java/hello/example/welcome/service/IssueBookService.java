@@ -1,6 +1,8 @@
 package hello.example.welcome.service;
 
 import hello.example.welcome.ExceptionHandling.BookNotFoundException;
+import hello.example.welcome.ExceptionHandling.InvalidEmailException;
+import hello.example.welcome.ExceptionHandling.StudentNotFoundException;
 import hello.example.welcome.MappingDTO.IssueMapper;
 import hello.example.welcome.dto.request.IssueReqDTO;
 import hello.example.welcome.dto.response.IssueResDTO;
@@ -12,6 +14,7 @@ import hello.example.welcome.repo.IssueRepository;
 import hello.example.welcome.repo.StudentRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,11 +30,23 @@ public class IssueBookService {
     }
 
     public IssueResDTO stdBookIssue(IssueReqDTO issueReqDTO){
+        if(issueReqDTO.getEmail()==null || issueReqDTO.getBookTitle()==null || issueReqDTO.getEmail().isBlank() || issueReqDTO.getBookTitle().isBlank() ||  issueReqDTO.getStatus()==null ){
+            throw new IllegalArgumentException("All required fields are must be provided");
+        }
+        if(!issueReqDTO.getIssueDate().equals(LocalDate.now())){
+            throw new IllegalArgumentException("Issue Date must be today");
+        }
         StudentTable student=studentRepository.findByEmail(issueReqDTO.getEmail());
+        if(student== null){
+            throw new StudentNotFoundException("Student Not found");
+        }
         BookTable book=bookRepository.findByBookTitle(issueReqDTO.getBookTitle());
+        if(book==null){
+            throw new BookNotFoundException("Book Not found");
+        }
         IssueTable issue=IssueMapper.mapToIssueTable(issueReqDTO,student,book);
         if(book.getAvailableCopies()<=0){
-            throw new BookNotFoundException("Book Not found");
+            throw new RuntimeException("Book Not Available");
         }
         book.setAvailableCopies(book.getAvailableCopies()-1);
         issue.setDueDate(issueReqDTO.getIssueDate().plusDays(30));
@@ -40,8 +55,19 @@ public class IssueBookService {
     }
     
     public List<IssueResDTO> getAllIssues(){
-        List<IssueTable> issueBooks=issueRepository.findAll();
-        return issueBooks.stream().map(IssueMapper::mapToIssueResDTO).toList();
+        return issueRepository.findAll().stream().map(IssueMapper::mapToIssueResDTO).toList();
+    }
+
+
+    public IssueResDTO searchEmail(String Email){
+        if(Email.isBlank() ){
+            throw new IllegalArgumentException("Is Empty");
+        }
+        if(!Email.endsWith("@gmail.com")){
+            throw new InvalidEmailException("Invalid EmailId");
+        }
+        IssueTable issue=issueRepository.findByStudentTableEmail(Email);
+        return IssueMapper.mapToIssueResDTO(issue);
     }
 
     public void deleteOneIssue(Long id){

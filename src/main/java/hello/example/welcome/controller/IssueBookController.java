@@ -26,6 +26,11 @@ public class IssueBookController {
             return issueBookService.getAllIssues();
         }
 
+        @GetMapping("/searchUser")
+        public IssueResDTO searchUserIssues(@RequestParam String Email){
+            return issueBookService.searchEmail(Email);
+        }
+
         @DeleteMapping("/delete/{id}")
         public String DeleteOne(@PathVariable Long id){
             issueBookService.deleteOneIssue(id);

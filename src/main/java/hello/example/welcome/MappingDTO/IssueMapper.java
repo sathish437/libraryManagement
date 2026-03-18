@@ -1,5 +1,7 @@
 package hello.example.welcome.MappingDTO;
 
+import hello.example.welcome.ExceptionHandling.BookNotFoundException;
+import hello.example.welcome.ExceptionHandling.StudentNotFoundException;
 import hello.example.welcome.dto.request.IssueReqDTO;
 import hello.example.welcome.dto.response.IssueResDTO;
 import hello.example.welcome.entity.BookTable;
