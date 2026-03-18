@@ -28,6 +28,7 @@ public class IssueResDTO {
     private Long bookId;
     @NotBlank
     private String bookTitle;
+
     @NotNull
     private LocalDate issueDate;
     @NotNull
