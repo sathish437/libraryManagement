@@ -18,6 +18,7 @@ public class ReturnMapper {
 
         returnResDTO.setReturnId(returnTable.getReturnId());
         returnResDTO.setIssueId(returnTable.getIssueTable().getIssueId());
+        returnResDTO.setEmail(returnTable.getIssueTable().getStudentTable().getEmail());
         returnResDTO.setReturnDate(returnTable.getReturnDate());
         returnResDTO.setFineAmount(returnTable.getFineAmount());
 

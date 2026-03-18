@@ -19,6 +19,9 @@ public class ReturnResDTO {
     private Long returnId;
     @NotNull
     private Long issueId;
+    @NotBlank
+    @Email
+    private String Email;
     @NotNull
     private LocalDate returnDate;
     @NotNull

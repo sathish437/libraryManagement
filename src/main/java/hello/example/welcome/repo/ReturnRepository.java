@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReturnRepository extends JpaRepository<ReturnTable,Long> {
+    ReturnTable findByIssueTableStudentTableEmail(String email);
 }
