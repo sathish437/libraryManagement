@@ -44,7 +44,6 @@ public class IssueBookService {
         return issueBooks.stream().map(IssueMapper::mapToIssueResDTO).toList();
     }
 
-
     public void deleteOneIssue(Long id){
         IssueTable issue=issueRepository.findById(id)
                         .orElseThrow(()->new RuntimeException(id+" Not Found"));
