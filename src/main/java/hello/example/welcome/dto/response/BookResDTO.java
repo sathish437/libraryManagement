@@ -1,5 +1,6 @@
 package hello.example.welcome.dto.response;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,5 +26,7 @@ public class BookResDTO {
     @NotNull
     @Min(0)
     private Long availableBooks;
-
+    @NotNull
+    @Min(0)
+    private Long totalCopies;
 }

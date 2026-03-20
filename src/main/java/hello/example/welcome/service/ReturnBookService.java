@@ -1,5 +1,7 @@
 package hello.example.welcome.service;
 
+import hello.example.welcome.ExceptionHandling.InvalidEmailException;
+import hello.example.welcome.ExceptionHandling.IssueBookNotFoundException;
 import hello.example.welcome.MappingDTO.ReturnMapper;
 import hello.example.welcome.dto.request.ReturnReqDTO;
 import hello.example.welcome.dto.response.IssueResDTO;
@@ -29,7 +31,9 @@ public class ReturnBookService {
     public ReturnResDTO UserReturnBook(ReturnReqDTO returnReqDTO){
         IssueTable issue=issueRepository.findByIssueId(returnReqDTO.getIssueId());
         ReturnTable returnTable=ReturnMapper.mapToReturnTable(returnReqDTO,issue);
-
+        if(issue==null){
+            throw new IssueBookNotFoundException("Issues Book Not found");
+        }
         if(!returnTable.getReturnDate().equals(LocalDate.now())){
             throw new IllegalArgumentException("Invalid Date");
         }
@@ -46,14 +50,20 @@ public class ReturnBookService {
     }
 
     public ReturnResDTO searchReturnedBook(String email){
+        if(!email.endsWith("@gmail.com")){
+            throw new InvalidEmailException("Invalid EmailId");
+        }
         ReturnTable returnTable=returnRepository.findByIssueTableStudentTableEmail(email);
+
         return ReturnMapper.mapToReturnResDTO(returnTable);
     }
 
     public void deleteReturnedBook(Long id){
-        returnRepository.deleteById(id);
-    }
 
+        ReturnTable returnTable= returnRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException(id+" Not Found"));
+        returnRepository.delete(returnTable);
+    }
     public void deleteAllReturnedBooks(){
         returnRepository.deleteAll();
     }

@@ -113,7 +113,7 @@ public class BookService {
 
     public void deleteBook(Long id){
         BookTable book=bookRepository.findById(id)
-                        .orElseThrow(()->new BookNotFoundException("book not found :"+id));
+                    .orElseThrow(()->new BookNotFoundException("book not found :"+id));
         bookRepository.delete(book);
     }
 

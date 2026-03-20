@@ -19,6 +19,7 @@ public class BookMapper {
         bookResDTO.setBookTitle(bookTable.getBookTitle());
         bookResDTO.setAuthor(bookTable.getAuthor());
         bookResDTO.setAvailableBooks(bookTable.getAvailableCopies());
+        bookResDTO.setTotalCopies(bookTable.getTotalCopies());
         return bookResDTO;
     }
 }
