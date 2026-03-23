@@ -1,22 +1,29 @@
 package hello.example.welcome.service;
 
+import hello.example.welcome.ExceptionHandling.BookDeletionNotAllowedException;
 import hello.example.welcome.ExceptionHandling.BookNotFoundException;
 import hello.example.welcome.MappingDTO.BookMapper;
 import hello.example.welcome.dto.request.BookReqDTO;
 import hello.example.welcome.dto.response.BookResDTO;
 import hello.example.welcome.entity.BookTable;
+import hello.example.welcome.entity.IssueTable;
+import hello.example.welcome.entity.Status;
 import hello.example.welcome.repo.BookRepository;
+import hello.example.welcome.repo.IssueRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BookService {
     private final BookRepository bookRepository;
-    public BookService(BookRepository bookRepository){
+    private final IssueRepository issueRepository;
+    public BookService(BookRepository bookRepository,IssueRepository issueRepository){
         this.bookRepository=bookRepository;
+        this.issueRepository=issueRepository;
     }
 
     public BookResDTO addBook(BookReqDTO bookReqDTO){
@@ -114,6 +121,9 @@ public class BookService {
     public void deleteBook(Long id){
         BookTable book=bookRepository.findById(id)
                     .orElseThrow(()->new BookNotFoundException("book not found :"+id));
+        if(!Objects.equals(book.getTotalCopies(),book.getAvailableCopies())){
+            throw new BookDeletionNotAllowedException("Book cannot be deleted until all issued copies are returned");
+        }
         bookRepository.delete(book);
     }
 

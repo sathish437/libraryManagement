@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface IssueRepository extends JpaRepository<IssueTable,Long> {
     IssueTable findByStudentTableEmail(String Email);
     IssueTable findByIssueId(Long id);
+    IssueTable findByBookTableBookId(Long id);
 }

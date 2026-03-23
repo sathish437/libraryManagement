@@ -56,4 +56,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(map,HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BookDeletionNotAllowedException.class)
+    public ResponseEntity<HashMap<String,Object>> handleBookNotDeleteFoundException(BookDeletionNotAllowedException ex){
+        HashMap<String,Object> map=new HashMap<>();
+
+        map.put("message",ex.getMessage());
+        map.put("statusCode",HttpStatus.CONFLICT.value());
+
+        return new ResponseEntity<>(map,HttpStatus.CONFLICT);
+    }
 }
