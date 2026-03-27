@@ -66,4 +66,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(map,HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(StudentDeletionNotAllowedException.class)
+    public ResponseEntity<HashMap<String,Object>> handleStudentDeletionNotAllowedException(StudentDeletionNotAllowedException ex){
+        HashMap<String,Object> map=new HashMap<>();
+
+        map.put("message",ex.getMessage());
+        map.put("statusCode",HttpStatus.CONFLICT.value());
+
+        return new ResponseEntity<>(map,HttpStatus.CONFLICT);
+    }
 }

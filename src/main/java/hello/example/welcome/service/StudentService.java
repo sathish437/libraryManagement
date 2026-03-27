@@ -1,24 +1,31 @@
 package hello.example.welcome.service;
 
 import hello.example.welcome.ExceptionHandling.EmailAlreadyExistsException;
+import hello.example.welcome.ExceptionHandling.StudentDeletionNotAllowedException;
 import hello.example.welcome.ExceptionHandling.StudentNotFoundException;
 import hello.example.welcome.MappingDTO.BookMapper;
 import hello.example.welcome.MappingDTO.StudentMapper;
 import hello.example.welcome.dto.request.StudentReqDTO;
 import hello.example.welcome.dto.response.StudentResDTO;
+import hello.example.welcome.entity.IssueTable;
+import hello.example.welcome.entity.Status;
 import hello.example.welcome.entity.StudentTable;
+import hello.example.welcome.repo.IssueRepository;
 import hello.example.welcome.repo.StudentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class StudentService {
     private final StudentRepository studentRepository;
-    public StudentService(StudentRepository studentRepository){
+    private final IssueRepository issueRepository;
+    public StudentService(StudentRepository studentRepository,IssueRepository issueRepository){
         this.studentRepository=studentRepository;
+        this.issueRepository=issueRepository;
     }
 
     public List<StudentResDTO> addManyStudent(List<StudentReqDTO> studentReqDTOS){
@@ -72,12 +79,29 @@ public class StudentService {
 
 
     public void deleteAllStudent(){
+        List<StudentTable> students=studentRepository.findAll();
+        List<IssueTable> issues=issueRepository.findAll();
+
+        for (StudentTable student:students){
+            boolean hasIssuedBooks = issueRepository.existsByStudentTableStudentIdAndStatus(student.getStudentId(), Status.Issued);
+            if (hasIssuedBooks) {
+                throw new StudentDeletionNotAllowedException(
+                        "Student cannot be deleted until all issued copies are returned"
+                );
+            }
+        }
         studentRepository.deleteAll();
     }
 
-    public void deleteStudent(Long id){
-        StudentTable student=studentRepository.findById(id)
-                        .orElseThrow(()-> new StudentNotFoundException(id+" not found"));
+    public void deleteStudent(Long id) {
+        StudentTable student = studentRepository.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id + " not found"));
+        boolean hasIssuedBooks = issueRepository.existsByStudentTableStudentIdAndStatus(id, Status.Issued);
+        if (hasIssuedBooks) {
+            throw new StudentDeletionNotAllowedException(
+                    "Student cannot be deleted until all issued copies are returned"
+            );
+        }
         studentRepository.delete(student);
     }
 }

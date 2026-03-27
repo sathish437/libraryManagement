@@ -128,6 +128,12 @@ public class BookService {
     }
 
     public void deleteAllBooks(){
+        List<BookTable> books=bookRepository.findAll();
+        for (BookTable book:books){
+            if(!Objects.equals(book.getTotalCopies(),book.getAvailableCopies())){
+                throw new BookDeletionNotAllowedException("Book cannot be deleted until all issued copies are returned");
+            }
+        }
         bookRepository.deleteAll();
     }
 }
