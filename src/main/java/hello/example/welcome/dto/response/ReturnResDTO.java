@@ -20,8 +20,9 @@ public class ReturnResDTO {
     @NotNull
     private Long issueId;
     @NotBlank
-    @Email
-    private String Email;
+    private String studentName;
+    @NotBlank
+    private String bookTitle;
     @NotNull
     private LocalDate returnDate;
     @NotNull

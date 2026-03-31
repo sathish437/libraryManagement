@@ -1,13 +1,11 @@
 package hello.example.welcome.service;
 
-import hello.example.welcome.ExceptionHandling.BookDeletionNotAllowedException;
+import hello.example.welcome.ExceptionHandling.DeletionNotAllowedException;
 import hello.example.welcome.ExceptionHandling.BookNotFoundException;
 import hello.example.welcome.MappingDTO.BookMapper;
 import hello.example.welcome.dto.request.BookReqDTO;
 import hello.example.welcome.dto.response.BookResDTO;
 import hello.example.welcome.entity.BookTable;
-import hello.example.welcome.entity.IssueTable;
-import hello.example.welcome.entity.Status;
 import hello.example.welcome.repo.BookRepository;
 import hello.example.welcome.repo.IssueRepository;
 import org.springframework.data.domain.Sort;
@@ -112,9 +110,6 @@ public class BookService {
 
     public List<BookResDTO> getAllBook(){
         List<BookTable> lists=bookRepository.findAll(Sort.by("bookTitle"));
-        if(lists.isEmpty()){
-            throw new BookNotFoundException("books not found");
-        }
         return lists.stream().map(BookMapper::mapToBookResDTO).toList();
     }
 
@@ -122,7 +117,7 @@ public class BookService {
         BookTable book=bookRepository.findById(id)
                     .orElseThrow(()->new BookNotFoundException("book not found :"+id));
         if(!Objects.equals(book.getTotalCopies(),book.getAvailableCopies())){
-            throw new BookDeletionNotAllowedException("Book cannot be deleted until all issued copies are returned");
+            throw new DeletionNotAllowedException("Book cannot be deleted until all issued copies are returned");
         }
         bookRepository.delete(book);
     }
@@ -131,7 +126,7 @@ public class BookService {
         List<BookTable> books=bookRepository.findAll();
         for (BookTable book:books){
             if(!Objects.equals(book.getTotalCopies(),book.getAvailableCopies())){
-                throw new BookDeletionNotAllowedException("Book cannot be deleted until all issued copies are returned");
+                throw new DeletionNotAllowedException("Book cannot be deleted until all issued copies are returned");
             }
         }
         bookRepository.deleteAll();

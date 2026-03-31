@@ -6,9 +6,11 @@ import hello.example.welcome.MappingDTO.ReturnMapper;
 import hello.example.welcome.dto.request.ReturnReqDTO;
 import hello.example.welcome.dto.response.IssueResDTO;
 import hello.example.welcome.dto.response.ReturnResDTO;
+import hello.example.welcome.entity.BookTable;
 import hello.example.welcome.entity.IssueTable;
 import hello.example.welcome.entity.ReturnTable;
 import hello.example.welcome.entity.Status;
+import hello.example.welcome.repo.BookRepository;
 import hello.example.welcome.repo.IssueRepository;
 import hello.example.welcome.repo.ReturnRepository;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,16 @@ import java.util.Optional;
 public class ReturnBookService {
     private final ReturnRepository returnRepository;
     private final IssueRepository issueRepository;
-    public ReturnBookService(ReturnRepository returnRepository,IssueRepository issueRepository){
+    private final BookRepository bookRepository;
+    public ReturnBookService(ReturnRepository returnRepository,IssueRepository issueRepository,BookRepository bookRepository){
         this.returnRepository=returnRepository;
         this.issueRepository=issueRepository;
+        this.bookRepository=bookRepository;
     }
 
     public ReturnResDTO UserReturnBook(ReturnReqDTO returnReqDTO){
         IssueTable issue=issueRepository.findByIssueId(returnReqDTO.getIssueId());
+        BookTable book=bookRepository.findByBookTitle(issue.getBookTable().getBookTitle());
         ReturnTable returnTable=ReturnMapper.mapToReturnTable(returnReqDTO,issue);
         if(issue==null){
             throw new IssueBookNotFoundException("Issues Book Not found");
@@ -39,6 +44,7 @@ public class ReturnBookService {
         }
         long days= ChronoUnit.DAYS.between(issue.getDueDate(),returnReqDTO.getReturnDate());
         long fine=(days>0) ? days:0;
+        book.setAvailableCopies(book.getAvailableCopies()+1);
         returnTable.setFineAmount(fine);
         issue.setStatus(Status.Returned);
         returnRepository.save(returnTable);
@@ -49,13 +55,11 @@ public class ReturnBookService {
         return returnRepository.findAll().stream().map(ReturnMapper::mapToReturnResDTO).toList();
     }
 
-    public ReturnResDTO searchReturnedBook(String email){
-        if(!email.endsWith("@gmail.com")){
-            throw new InvalidEmailException("Invalid EmailId");
-        }
-        ReturnTable returnTable=returnRepository.findByIssueTableStudentTableEmail(email);
+    public List<ReturnResDTO> searchReturnedBook(String name){
 
-        return ReturnMapper.mapToReturnResDTO(returnTable);
+        List<ReturnTable> returnTable=returnRepository.findByIssueTableStudentTableName(name);
+
+        return returnTable.stream().map(ReturnMapper::mapToReturnResDTO).toList();
     }
 
     public void deleteReturnedBook(Long id){

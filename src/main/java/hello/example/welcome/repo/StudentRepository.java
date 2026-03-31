@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<StudentTable,Long> {
     List<StudentTable> findByNameContainingIgnoreCase(String name);
     StudentTable findByEmail(String email);
+    boolean existsByEmail(String email);
 }

@@ -18,8 +18,7 @@ public class ReturnReqDTO {
     @NotNull
     private Long issueId;
     @NotBlank
-    @Email
-    private String email;
+    private String bookTitle;
     @NotNull
     private LocalDate returnDate;
 }

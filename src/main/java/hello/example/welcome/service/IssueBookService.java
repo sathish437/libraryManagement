@@ -1,6 +1,7 @@
 package hello.example.welcome.service;
 
 import hello.example.welcome.ExceptionHandling.BookNotFoundException;
+import hello.example.welcome.ExceptionHandling.DeletionNotAllowedException;
 import hello.example.welcome.ExceptionHandling.InvalidEmailException;
 import hello.example.welcome.ExceptionHandling.StudentNotFoundException;
 import hello.example.welcome.MappingDTO.IssueMapper;
@@ -8,6 +9,7 @@ import hello.example.welcome.dto.request.IssueReqDTO;
 import hello.example.welcome.dto.response.IssueResDTO;
 import hello.example.welcome.entity.BookTable;
 import hello.example.welcome.entity.IssueTable;
+import hello.example.welcome.entity.Status;
 import hello.example.welcome.entity.StudentTable;
 import hello.example.welcome.repo.BookRepository;
 import hello.example.welcome.repo.IssueRepository;
@@ -37,7 +39,8 @@ public class IssueBookService {
             throw new IllegalArgumentException("Issue Date must be today");
         }
         StudentTable student=studentRepository.findByEmail(issueReqDTO.getEmail());
-        if(student== null){
+        boolean emailExist=studentRepository.existsByEmail(issueReqDTO.getEmail());
+        if(!emailExist){
             throw new StudentNotFoundException("Student Not found");
         }
         BookTable book=bookRepository.findByBookTitle(issueReqDTO.getBookTitle());
@@ -55,29 +58,30 @@ public class IssueBookService {
     }
     
     public List<IssueResDTO> getAllIssues(){
-        return issueRepository.findAll().stream().map(IssueMapper::mapToIssueResDTO).toList();
+        List<IssueTable> issue=issueRepository.findByStatus(Status.Issued);
+        return issue.stream().map(IssueMapper::mapToIssueResDTO).toList();
     }
-
-
-    public IssueResDTO searchEmail(String Email){
-        if(Email.isBlank() ){
-            throw new IllegalArgumentException("Is Empty");
-        }
-        if(!Email.endsWith("@gmail.com")){
-            throw new InvalidEmailException("Invalid EmailId");
-        }
-        IssueTable issue=issueRepository.findByStudentTableEmail(Email);
-        return IssueMapper.mapToIssueResDTO(issue);
+    public List<IssueResDTO> searchName(String name){
+        List<IssueTable> issue=issueRepository.findByStudentTableNameContainingIgnoreCase(name);
+        return issue.stream().map(IssueMapper::mapToIssueResDTO).toList();
     }
 
     public void deleteOneIssue(Long id){
         IssueTable issue=issueRepository.findById(id)
                         .orElseThrow(()->new RuntimeException(id+" Not Found"));
-
+        if(issue.getStatus()!= Status.Returned){
+            throw new DeletionNotAllowedException("Student cannot be deleted until all issued books are returned");        }
         issueRepository.delete(issue);
     }
 
     public void deleteAllIssues(){
+        List<IssueTable> issue=issueRepository.findAll();
+        for(IssueTable issueTable:issue){
+            if(issueTable.getStatus()!= Status.Returned){
+                throw new DeletionNotAllowedException("Student cannot be deleted until all issued books are returned");            }
+        }
+
         issueRepository.deleteAll();
     }
+
 }

@@ -27,8 +27,8 @@ public class IssueBookController {
         }
 
         @GetMapping("/searchUser")
-        public IssueResDTO searchUserIssues(@RequestParam String Email){
-            return issueBookService.searchEmail(Email);
+        public List<IssueResDTO> searchUserIssues(@RequestParam String Name){
+            return issueBookService.searchName(Name);
         }
 
         @DeleteMapping("/delete/{id}")

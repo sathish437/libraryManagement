@@ -26,8 +26,8 @@ public class ReturnBookController {
     }
 
     @GetMapping("/Search")
-    public ReturnResDTO search(@RequestParam String email){
-        return returnBookService.searchReturnedBook(email);
+    public List<ReturnResDTO> search(@RequestParam String name){
+        return returnBookService.searchReturnedBook(name);
     }
 
     @DeleteMapping("/deleteAll")
