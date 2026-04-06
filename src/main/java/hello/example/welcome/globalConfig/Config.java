@@ -8,7 +8,7 @@ public class Config implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
-                .allowedOrigins("https://librarymanagement-1-nqwf.onrender.com/")
+                .allowedOrigins("https://librarymanagementfrontend-ngf5.onrender.com/")
                 .allowedMethods("GET","POST","PUT","DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true);
